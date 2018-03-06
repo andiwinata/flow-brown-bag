@@ -1,4 +1,4 @@
-// @flow
+/* ADD FLOW COMMENT HERE */
 
 let a: boolean
 a = true

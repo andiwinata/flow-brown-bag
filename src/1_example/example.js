@@ -1,7 +1,7 @@
-const a = 5
+const a: number = 5
 
 function squareToString(x) {
-  return (x * x).toString()
+  return `Square of ${x} is ${x * x}`
 }
 
 const b = squareToString(5)

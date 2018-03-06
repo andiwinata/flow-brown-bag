@@ -1,4 +1,4 @@
-// @flow
+/* ADD FLOW COMMENT HERE */
 
 // a.js
 type CustomType = {
