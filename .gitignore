@@ -1,0 +1,37 @@
+.DS_STORE
+*.log
+*.tgz
+
+node_modules
+package-lock.json
+schema.json
+
+src/__generated__/
+src/**/__generated__/
+
+tools/report.html
+tools/stats.json
+
+/build
+
+coverage
+
+.idea/
+
+.env
+dist/
+.vscode/
+jsconfig.json
+
+# Credentials
+/ci/credentials.yml
+public-key.pem
+
+# Functional tests
+tests/cssClasses.json
+tests/nightwatch/output
+tests/nightwatch/.env
+
+# Versioning
+/.version-git-hash
+/.version-git-tag

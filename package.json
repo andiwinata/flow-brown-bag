@@ -1,0 +1,13 @@
+{
+  "name": "flow-brown-bag",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "relay:schema:types": "gql2flow ./schema.json -o flow-typed/domain.flow.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

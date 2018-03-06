@@ -1,0 +1,1462 @@
+type Account {
+  autoplay: Boolean!
+  error: AccountError
+  id: ID!
+  location: AccountLocation
+}
+
+type AccountError {
+  message: String!
+  type: AccountErrorType!
+}
+
+# AccountErrorType defines the types of errors that can occur when retrieving account information
+enum AccountErrorType {
+  # Error specific to scenario where account does not exist in database and we need to update it
+  ACCOUNT_NOT_FOUND_IN_DATABASE
+
+  # Indicates that the provided authentication was not accepted
+  AUTHENTICATION_ERROR
+
+  # An error without a clearly defined type. This type will be quite common where
+  # special handling is not required for the error
+  GENERIC_ERROR
+
+  # Indicates that the request was not valid
+  INVALID_REQUEST_ERROR
+}
+
+type AccountLocation {
+  postCode: String
+  state: String
+  suburb: String
+}
+
+# Asset represents different types of assets (e.g. Url, Image, Article etc.)
+type Asset {
+  # The asset about
+  about: String!
+
+  # The type of the asset
+  assetType: String!
+
+  # Asset data
+  asset: AssetData!
+
+  # Asset brands
+  brands: [String]
+
+  # Asset categories
+  categories: [String]
+
+  # Asset category
+  category: AssetCategory
+
+  # Asset comments, using a nested comments query
+  commentsConnection(limit: Int!): CommentsConnection!
+
+  # Asset dates
+  dates: AssetDates!
+
+  # Editing state of the asset
+  editingState: String!
+
+  # The asset intro
+  intro: String
+
+  # Label associated with the asset (i.e. exclusive, etc)
+  label: String
+
+  # Legal status of the asset
+  legalStatus: String!
+
+  # Editing state of the asset
+  publicState: String!
+
+  # Article image
+  featuredImages: AssetImages
+
+  # The asset headline
+  headlines: AssetHeadlines!
+
+  # The id of the asset
+  id: ID!
+
+  # The participants of the asset
+  participants: AssetParticipants
+
+  # The source cms of the asset
+  sourceCms: AssetSourceCms
+
+  # The sponsor of the asset
+  sponsor: AssetSponsor
+
+  # The tags of the article
+  tags: AssetTag
+
+  # Comments count
+  totalCommentCount: Int! @deprecated(reason: "Please, use the *comments* query under *asset* to fetch this total comment count. This one is retained for backwards compatibility reasons.")
+
+  # The asset URLs
+  urls: AssetURLs
+}
+
+# The value type for asset category
+type AssetCategory {
+  id: Int
+  name: String
+  urls: AssetCategoryURLs
+}
+
+# Category URLs type
+type AssetCategoryURLs {
+  published: AssetPublishedURLs
+}
+
+# AssetComment represents comments data for the asset
+type AssetComment {
+  # Comment body is UTF-8 character sequence entered by user/author via coral talk and not *rejected* by moderator
+  body: String!
+
+  # Comment creation date
+  created_at: String!
+
+  # Comment Id is unique graphql ID assigned to each comment/reply
+  id: ID!
+
+  # User who created the comment
+  user: String!
+}
+
+# AssetData represents the core data of the asset: about, headlines and byline
+type AssetData {
+  # The asset description.
+  about: String! @deprecated(reason: "Please, use the *about* field at the root level. This one is added for backwards compatibility reasons.")
+
+  # The asset byline
+  byline: String
+
+  # Video duration
+  duration: Int
+
+  # The asset headlines.
+  headlines: AssetHeadlines! @deprecated(reason: "Please, use the *headlines* field at the root level. This one is added for backwards compatibility reasons.")
+
+  # Indicates if the asset is a live article which is currently live
+  live: Boolean
+}
+
+# AssetDates is an object containing different dates fields
+type AssetDates {
+  # The date when the asset was created
+  created: String!
+
+  # The date when the asset was first published
+  firstPublished: String
+
+  # The date when the asset was last modified
+  modified: String!
+
+  # The date when the asset was published
+  published: String!
+
+  # The date when the asset was saved
+  saved: String
+
+  # The date when the asset is scheduled to be taken down
+  timeToTakeDown: String
+}
+
+# An edge object for an asset
+type AssetEdge {
+  # A cursor used for pagination
+  cursor: ID!
+
+  # The asset represented by this asset edge
+  node: Asset
+}
+
+# Asset headline field
+type AssetHeadlines {
+  # Headline of the asset
+  headline: String!
+}
+
+# All the asset image types. Each asset has different images for different screen
+# sizes or components. For example one image is shown on asset page, but
+# completely different image (crop, aspect ratio and offeset is uesd in a content
+# unit for example)
+type AssetImages {
+  landscape16x9: Image
+  landscape3x2: Image
+  portrait2x3: Image
+  square1x1: Image
+}
+
+# Asset list contains a list of assets
+type AssetList {
+  id: Int!
+  description: String
+  itemListElement: [AssetListEntry]!
+  name: String!
+}
+
+# AssetListEntry represents a single asset in an asset list
+type AssetListEntry {
+  # Unique id
+  id: ID!
+
+  # Used for ordering when rendering the content unit
+  position: Int!
+
+  # Fields used to overwrite the corresponding fields of the underlying asset
+  variations: Variations
+}
+
+# AssetParticipants holds participants information for an asset
+type AssetParticipants {
+  # Authors of an asset
+  authors: [Author]
+}
+
+# The value type for published a URLs map
+type AssetPublishedURL {
+  # Brand is used to extract the environment specific brand host
+  brand: String!
+
+  # Path of the url
+  path: String!
+}
+
+# Published URLs map, for example:
+type AssetPublishedURLs {
+  brisbanetimes: AssetPublishedURL
+  smh: AssetPublishedURL
+  theage: AssetPublishedURL
+  watoday: AssetPublishedURL
+}
+
+# AssetReadError defines an error that can occur when calling assetRead()
+type AssetReadError {
+  message: String!
+  type: AssetReadErrorType!
+}
+
+# AssetReadErrorType defines AssetReadError types
+enum AssetReadErrorType {
+  # Indicates that the provided authentication was not accepted
+  AUTHENTICATION_ERROR
+
+  # An error without a clearly defined type. This type will be quite common where
+  # special handling is not required for the error
+  GENERIC_ERROR
+
+  # Indicates that the request was not valid
+  INVALID_REQUEST_ERROR
+}
+
+# AssetReadInput models the input to a assetRead mutation
+input AssetReadInput {
+  # ID of the asset that has been read
+  assetId: String!
+
+  # ID of the device used to identify the user
+  deviceId: String
+}
+
+# AssetReadReference models an assetRead mutation reference
+type AssetReadReference {
+  assetEdge: AssetEdge
+  readingHistoryId: ID
+  shortlistId: ID!
+  shortlistItem: ShortlistItem!
+}
+
+# AssetReadReply models the output for a assetRead mutation
+type AssetReadReply {
+  error: AssetReadError
+  reference: AssetReadReference
+}
+
+# A connection object for paginated assets
+type AssetsConnection {
+  # Access to the assets without edge wrapping.
+  assets: [Asset]
+
+  # The edges for each of the assets.
+  edges: [AssetEdge]
+
+  # Information for paginating this connection
+  pageInfo: PageInfo!
+
+  # Total number of results
+  totalCount: Int
+}
+
+# AssetSourceCms holds data related to the source cms of an asset
+type AssetSourceCms {
+  # Type of the cms of the asset
+  cmsType: String
+}
+
+# AssetSponsor holds sponsor information for an asset
+type AssetSponsor {
+  # Name of the sponsor
+  name: String
+}
+
+# Asset tag type used in
+type AssetTag {
+  primary: String! @deprecated(reason: "Please use the *primaryTag.displayName* field.")
+  primaryTag: AssetTagDetails
+  secondary: [AssetTagDetails]
+}
+
+# Asset tag details
+type AssetTagDetails {
+  displayName: String!
+  urls: TagURLs
+}
+
+# AssetType represents the different types of assets (e.g. article, gallery, url, etc.)
+enum AssetType {
+  article
+  bespoke
+  featureArticle
+  gallery
+  liveArticle
+  url
+  video
+}
+
+# Asset URL contains brand and path used to construct a URL
+type AssetURL {
+  # Brand is used to extract the environment specific brand host
+  brand: String!
+
+  # Path of the url
+  path: String!
+}
+
+# The urls of the asset
+#
+#     "urls": {
+#         "canonical": {
+#             "brand": "smh",
+#             "path": "/some/path/here"
+#         },
+#         "published": {
+#             "brisbanetimes": {
+#                 "path": "/some/path/here"
+#             },
+#             "smh": {
+#                 "path": "/some/path/here"
+#             },
+#             "theage": {
+#                 "path": "/some/path/here"
+#             },
+#             "watoday": {
+#                 "path": "/some/path/here"
+#             }
+#         }
+#     }
+#
+type AssetURLs {
+  # Canonical URL
+  canonical: AssetURL
+
+  # Published URL
+  published: AssetPublishedURLs
+}
+
+# Author information
+type Author {
+  bio: String!
+  dates: AuthorDates!
+  email: String
+  featuredImages: AuthorImages
+  id: ID!
+  name: String!
+  social: AuthorSocial
+  title: String
+
+  # Email for user management only
+  userEmail: String
+
+  # A paginated collection of assets by this author sorted descending by published date.
+  assetsConnection(
+    # filter assets by brand
+    brand: String!
+
+    # number of items to return per page
+    count: Int = 5
+
+    # optional cursor (encoded asset ID) into the paginated results
+    since: ID
+  ): AssetsConnection
+}
+
+# Dates related to the author entity
+type AuthorDates {
+  created: String!
+  updated: String
+}
+
+# Author featured images
+type AuthorImages {
+  headshot: Image
+}
+
+# Author social links
+type AuthorSocial {
+  # The author's facebook ID
+  facebook: AuthorSocialID
+
+  # The author's GooglePlus ID
+  googlePlus: AuthorSocialID
+
+  # The author's Twitter ID
+  twitter: AuthorSocialID
+}
+
+# Represents the ID of the author in a given social media
+type AuthorSocialID {
+  id: String
+}
+
+# Clipping models a clipping
+type Clipping {
+  # Asset being clipped
+  asset: Asset!
+
+  # Asset variations
+  assetVariations: Variations
+}
+
+# ClippingAddInput models the input to a clippingAdd mutation
+input ClippingAddInput {
+  # string representation asset data with variations if any
+  assetVariations: String
+
+  # ID of the asset being clipped
+  assetID: String!
+}
+
+type ClippingAddReply {
+  # ID of the asset being clipped
+  assetID: String!
+}
+
+# CommentsConnection represents comments query response
+#
+# 	{
+# 		"totalCommentCount": 4,
+# 		"nodes": [
+# 			{
+#      			"id": "some-graphql-id",
+#      			"body": "some comment",
+#      			"created_at": "2017-11-06T00:00:49.149Z",
+#      			"user": "some user"
+# 			}
+# 		]
+#  	}
+#
+type CommentsConnection {
+  # List of comment nodes
+  nodes: [AssetComment!]
+
+  # Total number of comments which are not marked *rejected* by coral talk moderator
+  totalCommentCount: Int!
+}
+
+# Content unit represents the data that is bound to a piece of rendering block of assets
+type ContentUnit {
+  # The asset list is an optional field which is only used by asset with manually curated content
+  assetList: AssetList
+
+  # Array of assets
+  assets: [Asset!]!
+
+  # The config of the content unit
+  config: ContentUnitConfig
+
+  # The description of the content unit
+  description: String
+
+  # The unique id of the content unit
+  id: Int!
+
+  # Maximum number of assets to be displayed. The assets array might have different length
+  maxCount: Int!
+
+  # The name of the content unit
+  name: String!
+
+  # The name of the type of content unit
+  typeName: String!
+}
+
+# ContentUnitConfig represents the configuration of the content unit
+type ContentUnitConfig {
+  # Display Configuration of the content in the content unit
+  displayConfig: DisplayConfiguration
+
+  # The heading of the content unit
+  heading: String
+
+  # The link of the heading of the content unit
+  headingLink: String
+
+  # Additional links to display alongside the heading of the content unit
+  links: [ContentUnitConfigLink]
+
+  # Mode of the content in the content unit
+  mode: String
+
+  # Sponsor of the content in the content unit
+  sponsor: String
+
+  # Configuration for any related widget to the content unit
+  widget: WidgetConfiguration
+}
+
+type ContentUnitConfigLink {
+  # The url for the additional link
+  link: String
+
+  # The name for the additional link
+  title: String
+}
+
+# Data object for Cricket sport
+type CricketScorecardData {
+  # Classnames required by the widget
+  classNames: String
+
+  # Flag to enable/disable lazy load of cricket iframe
+  lazyLoad: String
+}
+
+# Foreign currency codes
+enum CurrencyCode {
+  AUD
+  CAD
+  CHF
+  CNY
+  EUR
+  GBP
+  HKD
+  IDR
+  INR
+  JPY
+  MYR
+  NZD
+  SGD
+  THB
+  USD
+  ZAR
+}
+
+# Business Data Currency Compare data
+type CurrencyCompare {
+  # Identifier of a currency comparison
+  compareName: String!
+
+  # Currency code being converted from
+  from: CurrencyCode!
+
+  # Currency name being converted from
+  fromDisplayName: String!
+
+  # Currency code being converted to
+  to: CurrencyCode!
+
+  # Currency name being converted to
+  toDisplayName: String!
+
+  # The current price
+  price: Float!
+
+  # Last time the price was updated
+  lastUpdated: String!
+
+  # The value change of the price
+  priceMvt: Float!
+
+  # The percentage change of the price
+  priceMvtPct: Float!
+
+  # The buy price
+  buyPrice: Float!
+
+  # The sell price
+  sellPrice: Float!
+}
+
+# DisplayConfiguration represents the display configuration of the content unit
+type DisplayConfiguration {
+  # Show the primary tag for the content unit
+  showPrimaryTag: Boolean
+}
+
+# Football represents the the scoreboard data for winter sports
+type FootballScoreboard {
+  # The id of the query
+  id: Int!
+
+  # An array of matches
+  matches: [Match]!
+}
+
+# Weather *forecast* for the location/postcode
+#
+# 	{
+#    	"forecast": {
+#      		"current": 0,
+#      		"maximum": 0,
+#      		"minimum": 0,
+#      		"weatherSummary": "Some weather condition"
+#    	}
+#  	}
+#
+type Forecast {
+  # Current temperature of the day
+  current: Float
+
+  # Maximum temperature of the day
+  maximum: Float
+
+  # Minimum temperature of the day
+  minimum: Float
+
+  # Current weather conditions
+  weatherSummary: String!
+}
+
+# Holds image metadata
+type Image {
+  data: ImageData!
+}
+
+# Holds image fields needed for rendering an image
+type ImageData {
+  altText: String
+  aspect: Float
+  autoCrop: Boolean
+  autocrop: Boolean @deprecated(reason: "Please use the *ImageData.autoCrop* field.")
+  caption: String
+  credit: String
+  cropWidth: Int
+  id: ID!
+  offsetX: Int
+  offsetY: Int
+  source: String
+  zoom: Float
+}
+
+# Intraday index price series and price movement data
+type IndexPrice {
+  code: String!
+  name: String!
+  price: Float!
+  priceClose: Float!
+  priceMovement: Float!
+  priceMovementPercent: Float!
+  series: [IndexPriceItem!]!
+  lastUpdated: String!
+}
+
+# Contains the price of an index at a given point in time.
+type IndexPriceItem {
+  price: Float!
+  time: String!
+}
+
+# Quote Issuer Name
+type IssuerName {
+  fullName: String!
+  abbrevName: String!
+  shortName: String!
+}
+
+# LimitVariants represents referrer based variants of paywall limit
+type LimitVariants {
+  referrers: PaywallExceptionsReferrers
+}
+
+type Listing {
+  asset: Asset
+
+  # The brief for a listing
+  brief: String
+
+  # The collaborators for a listing
+  collaborators: [Author!]!
+
+  # The deadline date for the listing
+  deadline: String!
+
+  # The identifier for listing
+  identifier: String
+}
+
+# ListingsFilterType represents the different ways listings could be filtered
+enum ListingsFilterType {
+  NONE
+  DRAFT
+  READY
+  REVIEW
+}
+
+# ListingsOrderType represents the different ways listings could be ordered
+enum ListingsOrderType {
+  DEADLINE
+  LAST_MODIFIED
+  PUBLISHED
+}
+
+# Match describes a match of a winter code
+type Match {
+  # The id of the match
+  id: ID!
+
+  # The team playing at home
+  homeTeam: Team!
+
+  # The team playing away
+  awayTeam: Team!
+
+  # The date of the match
+  date: String!
+
+  # The Location of the match
+  location: String!
+
+  # The Location Abbreviation for tooltip display
+  displayLocation: String!
+
+  # The match status
+  status: String!
+
+  # The match number in round
+  number: Int!
+
+  # The round number for the match
+  roundID: Int!
+}
+
+# MeterRule represents the metering rule
+type MeterRule {
+  count: Int
+  prompt: Prompt
+  promptVariants: [PromptVariants]
+}
+
+# MetersVariants represents referrer based variants of meter rules
+type MetersVariants {
+  referrers: PaywallExceptionsReferrers
+  meters: [MeterRule]
+}
+
+# The mutation type, represents all of the mutation points into our object graph
+type Mutation {
+  #  marks an asset as read by a user
+  assetRead(read: AssetReadInput!): AssetReadReply!
+
+  # clippingAdd adds a clipping for logged-in editor
+  clippingAdd(clipping: ClippingAddInput!): ClippingAddReply!
+
+  # Subscribe to newsletter
+  newsletterSubscribe(subscription: NewsletterSubscribeInput!): SubscribeReply!
+
+  # shortlistAddItem adds an item to a shortlist
+  shortlistAddItem(addItem: ShortlistAddItemInput!): ShortlistAddItemReply!
+
+  # shortlistMerge merges a device shortlist into a member's shortlist
+  shortlistMerge(merge: ShortlistMergeInput!): ShortlistMergeReply!
+
+  # shortlistRemoveItem removes an item from a shortlist
+  shortlistRemoveItem(removeItem: ShortlistRemoveItemInput!): ShortlistRemoveItemReply!
+
+  # tagCreate creates a new Tag to help editors categorise articles and other assets
+  tagCreate(tagInfo: TagCreateInput!): TagCreateReply!
+
+  # tagUpdate updates an existing Tag to help editors categorise articles and other assets
+  tagUpdate(tagInfo: TagUpdateInput!): TagUpdateReply!
+  updateAccount(account: UpdateAccountInput!): UpdateAccountResult
+  updatePage(id: ID!, config: PageConfigInput!): PageUpdate
+}
+
+input NewsletterSubscribeInput {
+  channelKey: String!
+  email: String!
+  newsletterID: String!
+}
+
+# Page holds page metadata
+type Page {
+  # The page configuration
+  config: PageConfig
+
+  # The page description
+  description: String
+
+  # The page ID
+  id: ID!
+
+  # The page name
+  name: String
+
+  # The page type
+  pageType: PageType!
+
+  # The redirect to a page
+  redirect: String
+}
+
+type PageConfig {
+  # The configuration to disable ads
+  adsDisabled: Boolean @deprecated(reason: "Please, use the *ads* object. This one is added for backwards compatibility reasons.")
+
+  # The page type
+  pageType: String! @deprecated(reason: "There is no longer a need to restrict page configs to a particular page type.")
+
+  # The pages ad configuration
+  ads: PageConfigAds
+
+  # The pages nielsen configuration
+  nielsen: PageConfigNielsen
+
+  # The pages seo configuration
+  seo: PageConfigSEO
+}
+
+type PageConfigAds {
+  # Whether or not ads should be suppressed for the appropriate page
+  suppress: Boolean!
+}
+
+input PageConfigInput {
+  # The configuration to disable ads
+  adsDisabled: Boolean
+
+  # The page type
+  pageType: PageType!
+}
+
+type PageConfigNielsen {
+  # Nielsen appID for the page
+  appID: String
+
+  # Nielsen ASN for the page
+  asn: String
+
+  # Nielsen sega for the page
+  sega: String
+}
+
+type PageConfigSEO {
+  # SEO description of the page
+  description: String
+
+  # SEO keywords of the page
+  keywords: String
+
+  # SEO title of the page
+  title: String
+}
+
+# Information for paginating a connection
+type PageInfo {
+  startCursor: ID
+  endCursor: ID
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+
+  # StartOffset used for offset based pagination
+  startOffset: Int
+
+  # EndOffset used for offset based pagination
+  endOffset: Int
+}
+
+enum PageType {
+  homepage
+}
+
+type PageUpdate {
+  # The page ID
+  id: ID!
+}
+
+# PaywallExceptions represents the paywall rule exceptions
+type PaywallExceptions {
+  referrers: PaywallExceptionsReferrers
+  referrers_variants: [PaywallExceptionsReferrersVariants]
+  sponsored: Boolean
+}
+
+# PaywallExceptionsReferrers represents the exceptions for referrers in regards to the paywall rules
+type PaywallExceptionsReferrers {
+  domains: [String]
+  limit: Int
+}
+
+# PaywallExceptionsReferrersVariants represents the variant exceptions for referrers in regards to the paywall rules
+type PaywallExceptionsReferrersVariants {
+  referrers: PaywallExceptionsReferrers
+}
+
+# PaywallInclusions represents the paywall rule inclusions
+type PaywallInclusions {
+  tags: [String!]
+}
+
+# PaywallRule represents the paywall rules
+type PaywallRule {
+  enabled: Boolean
+  exceptions: PaywallExceptions
+  inclusions: PaywallInclusions
+  limit: Int
+  prompt: Prompt
+  promptVariants: [PromptVariants]
+  limit_variants: [LimitVariants]
+}
+
+# Prompt represents the meter/paywall prompt
+type Prompt {
+  callToAction: String
+  countRemaining: String
+  message: String
+  style: String
+  subscriptionURL: String
+  title: String
+}
+
+# PromptVariants represents category based variants of prompts
+type PromptVariants {
+  category: String @deprecated(reason: "Please use the *categories* array. *category* is available only for backwards compatibility.")
+  prompt: Prompt
+  categories: [String]
+  tags: [String!]
+}
+
+# The query type, represents all of the entry points into our object graph
+type Query {
+  # Retrieve user account settings. Requesting by ID is deprecated - this will
+  # only ever retrieve the account of the logged in user
+  account(id: ID): Account
+
+  # Retrieve asset by ID
+  asset(id: String!): Asset
+
+  # Get the last *count* assets by navigation path. If *sinceID* is provided, it
+  # will be used for pagination. The assets will be sorted by published date in
+  # descending order.
+  assetsConnectionByNavigationPath(brand: String!, path: String!, count: Int!, types: [String!]!, sinceID: ID): AssetsConnection
+
+  # Get the last *count* assets by tag. If *sinceID* is provided, it will be used
+  # for pagination. The assets will be sorted by published date in descending order.
+  assetsConnectionByTag(brand: String!, count: Int!, sinceID: ID, tagID: String!, types: [AssetType!]): AssetsConnection
+  author(id: ID!): Author
+  authorSearch(name: String!): [Author]
+
+  # Retrieve clippings of authenticated user
+  clippings: [Clipping!]!
+  contentUnit(id: Int!, includeUnpublished: Boolean, brand: String): ContentUnit
+  currencyCompare(from: CurrencyCode!, to: [CurrencyCode!]!): [CurrencyCompare!]!
+
+  # Returns the delayed price data (intraday series + movement data) for the requested local and global index codes.
+  indexPrices(indexCodes: [String!] = [], globalIndexCodes: [String!] = []): [IndexPrice!]!
+
+  # Retrieve the latest assets by brand, render and type
+  latestAssets(brand: String!, categories: [Int!], count: Int!, render: String!, types: [AssetType!]!): [Asset!]!
+  listings(filter: ListingsFilterType!, orderBy: ListingsOrderType!, ascending: Boolean): [Listing!]!
+  tempListings(filter: ListingsFilterType!, orderBy: ListingsOrderType!, ascending: Boolean): [Listing!]!
+  mostPopularStories(assetType: String, brand: String!, category: String, count: Int, subCategory: String, tags: [String!]): [Asset!]!
+
+  # Retrieve page by ID
+  page(id: ID!): Page
+
+  # Retrieve page by brand, render and path
+  pageByNavigationPath(brand: String!, render: String!, path: String!): Page
+  paywallRules(brand: String!): Rules
+  publicSearch(brand: String!, query: String!, offset: Int, pageSize: Int!): AssetsConnection
+  readingHistory: ReadingHistoryResponse!
+  search(brand: String, query: String!, includeUnpublished: Boolean, offset: Int, brands: [String!], dateFrom: String, dateTo: String, editingState: String): AssetsConnection
+  scoreboard(id: ID!): FootballScoreboard!
+  shortlist(deviceId: String): ShortlistResponse!
+  tag(brand: String!, id: ID!): Tag
+  todaysPaper(brand: String!): TodaysPaperResponse!
+  searchTags(search: String!, field: TagSearchField!, currentID: String = "0", pageSize: Int = 20): TagsReply!
+  topBottomQuotes: [TopBottomQuote!]!
+  trending(brand: String!, count: Int): [Asset!]!
+  weatherForecast(postcode: String!, location: String!): Forecast!
+  tagContexts: TagContextsReply!
+  tagThemes: TagThemesReply!
+}
+
+# ReadingHistory holds a paginated collection of assets read by the user,
+# sorted descending by timestamp.
+type ReadingHistory {
+  # Unique ID of the reading history
+  id: ID!
+
+  # A paginated collection of assets in the reading history, sorted in reverse chronological order.
+  assetsConnection(
+    # number of items to return per page
+    first: Int = 10
+
+    # cursor of asset to start from
+    after: String
+  ): AssetsConnection
+}
+
+# ReadingHistoryError defines an error that can occur when operating on a reading history
+type ReadingHistoryError {
+  message: String!
+  type: ReadingHistoryErrorType!
+}
+
+# ReadingHistoryErrorType defines the types of errors that can occur for interacting with reading histories
+enum ReadingHistoryErrorType {
+  # Indicates that the provided authentication was not accepted
+  AUTHENTICATION_ERROR
+
+  # An error without a clearly defined type. This type will be quite common where
+  # special handling is not required for the error
+  GENERIC_ERROR
+}
+
+# ReadingHistoryResponse is the response to a reading history request
+type ReadingHistoryResponse {
+  error: ReadingHistoryError
+  readingHistory: ReadingHistory
+}
+
+# Rules represents the meter and paywall rules
+type Rules {
+  meters: [MeterRule]
+  paywall: PaywallRule
+  meters_variants: [MetersVariants]
+}
+
+# Data object for AFL, NRL and Rugby Union sport types
+type ScoreboardData {
+  # The identification number for the game/series
+  gameID: String
+
+  # The title of the sport/widget
+  title: String
+}
+
+# Shortlist holds assets that have been shortlisted by the user for later reading
+type Shortlist {
+  # Unique ID of the shortlist
+  id: ID
+
+  # Items which have been added to the shortlist
+  items: [ShortlistItem]
+
+  # A paginated collection of assets in the shortlist, sorted descending by date and time.
+  assetsConnection(
+    # number of items to return on the first page
+    first: Int = 20
+
+    # cursor of asset to start from
+    after: String
+  ): AssetsConnection
+}
+
+# ShortlistAddItemError defines an error that can occur when adding an item to a Shortlist
+type ShortlistAddItemError {
+  message: String!
+  type: ShortlistAddItemErrorType!
+}
+
+# ShortlistErrorType defines the types of errors that can occur when adding an item to a shortlists
+enum ShortlistAddItemErrorType {
+  # Indicates that the provided authentication was not accepted
+  AUTHENTICATION_ERROR
+
+  # An error without a clearly defined type. This type will be quite common where
+  # special handling is not required for the error
+  GENERIC_ERROR
+
+  # Indicates that the request was not valid
+  INVALID_REQUEST_ERROR
+}
+
+# ShortlistAddItemInput models the input to a shortlistAddItem mutation
+input ShortlistAddItemInput {
+  # ID of the device used to identify the shortlist to modify
+  deviceId: String
+
+  # ID of the item to add to the shortlist
+  itemId: String!
+
+  # Minutes of offset from UTC time for the client
+  clientUtcOffsetMinutes: Int!
+}
+
+# ShortlistAddItemReference defines an item added to a Shortlist
+type ShortlistAddItemReference {
+  shortlistId: ID!
+  item: ShortlistItem
+  edge: AssetEdge
+}
+
+# ShortlistAddItemReply models the output for a shortlistAddItem mutation
+type ShortlistAddItemReply {
+  error: ShortlistAddItemError
+  addedItem: ShortlistAddItemReference
+}
+
+# ShortlistError defines an error that can occur when operating on a Shortlist
+type ShortlistError {
+  message: String!
+  type: ShortlistErrorType!
+}
+
+# ShortlistErrorType defines the types of errors that can occur for interacting with shortlists
+enum ShortlistErrorType {
+  # Indicates that the provided authentication was not accepted
+  AUTHENTICATION_ERROR
+
+  # An error without a clearly defined type. This type will be quite common where
+  # special handling is not required for the error
+  GENERIC_ERROR
+
+  # Indicates that the request was not valid
+  INVALID_REQUEST_ERROR
+}
+
+# ShortlistItem is a single asset shortlisted by a user
+type ShortlistItem {
+  id: ID!
+  assetId: ID!
+  shortlistedDate: String
+}
+
+# ShortlistMergeError defines an error that can occur when merging two shortlists
+type ShortlistMergeError {
+  message: String!
+  type: ShortlistMergeErrorType!
+}
+
+# ShortlistMergeErrorType defines the types of errors that can occur when merging two shortlists
+enum ShortlistMergeErrorType {
+  # Indicates that the provided authentication was not accepted
+  AUTHENTICATION_ERROR
+
+  # An error without a clearly defined type. This type will be quite common where
+  # special handling is not required for the error
+  GENERIC_ERROR
+}
+
+# ShortlistMergeInput models the input to a shortlistMerge mutation
+input ShortlistMergeInput {
+  # ID of the device used to identify the shortlist to merge
+  deviceId: String!
+}
+
+# ShortlistMergeReply models the output for a shortlistMerge mutation
+type ShortlistMergeReply {
+  error: ShortlistMergeError
+}
+
+# ShortlistRemoveItemError defines an error that can occur when removing an item from a Shortlist
+type ShortlistRemoveItemError {
+  message: String!
+  type: ShortlistRemoveItemErrorType!
+}
+
+# ShortlistErrorType defines the types of errors that can occur when removing an item from shortlists
+enum ShortlistRemoveItemErrorType {
+  # Indicates that the provided authentication was not accepted
+  AUTHENTICATION_ERROR
+
+  # An error without a clearly defined type. This type will be quite common where
+  # special handling is not required for the error
+  GENERIC_ERROR
+
+  # Indicates that the request was not valid
+  INVALID_REQUEST_ERROR
+}
+
+# ShortlistRemoveItemInput models the input to a shortlistRemoveItem mutation
+input ShortlistRemoveItemInput {
+  # ID of the device used to identify the shortlist to modify
+  deviceId: String
+
+  # ID of the item to remove from the shortlist
+  itemId: String!
+}
+
+# ShortlistRemoveItemReference is a reference to a defined shortlist, typically returned by mutations
+type ShortlistRemoveItemReference {
+  # ID of the shortlist being referenced
+  shortlistId: ID!
+
+  # ID of the item removed
+  itemId: String!
+}
+
+# ShortlistRemoveItemReply models the output for a shortlistRemoveItem mutation
+type ShortlistRemoveItemReply {
+  error: ShortlistRemoveItemError
+  removedItem: ShortlistRemoveItemReference
+}
+
+# ShortlistResponse is the response to a shortlist request
+type ShortlistResponse {
+  error: ShortlistError
+  shortlist: Shortlist
+}
+
+type SubscribeReply {
+  success: Boolean!
+}
+
+# Tag represents the tag and its associated asset information
+type Tag {
+  context: String!
+  description: String!
+  displayName: String!
+  id: ID!
+  name: String!
+  seo: TagSEO
+  themes: [String!]
+  urls: TagURLs
+  visible: Boolean!
+
+  # A paginated collection of assets by this tag sorted descending by published date.
+  assetsConnection(
+    # filter assets by brand
+    brand: String!
+
+    # number of items to return per page
+    count: Int = 5
+
+    # optional cursor (encoded asset ID) into the paginated results
+    since: ID
+
+    # filter only assets of the specified types
+    types: [AssetType!]
+  ): AssetsConnection
+}
+
+# TagContext represents the tag context
+type TagContext {
+  description: String!
+  id: ID!
+  name: String!
+}
+
+type TagContextsReply {
+  TagContexts: [TagContext]!
+}
+
+input TagCreateInput {
+  contextID: String!
+  description: String
+  displayName: String!
+  name: String!
+  SEODescription: String
+  SEOTitle: String
+  slug: String
+  themeIDs: [String!]
+  visible: Boolean!
+}
+
+type TagCreateReply {
+  tagID: ID!
+}
+
+# The value type for published a URLs map
+type TagPublishedURL {
+  path: String!
+}
+
+# Tag Published URLs map, for example:
+type TagPublishedURLs {
+  brisbanetimes: TagPublishedURL
+  smh: TagPublishedURL
+  theage: TagPublishedURL
+  watoday: TagPublishedURL
+}
+
+enum TagSearchField {
+  displayName
+  name
+  partialText
+}
+
+# Tag SEO contains the seo for a tag
+type TagSEO {
+  description: String
+  keywords: String
+  title: String
+}
+
+type TagsReply {
+  Tags: [Tag]!
+}
+
+# TagTheme represents the tag theme
+type TagTheme {
+  description: String!
+  id: ID!
+  name: String!
+}
+
+type TagThemesReply {
+  TagThemes: [TagTheme]!
+}
+
+input TagUpdateInput {
+  contextID: String!
+  description: String
+  displayName: String!
+  ID: String!
+  name: String!
+  SEODescription: String
+  SEOTitle: String
+  slug: String
+  themeIDs: [String!]
+  visible: Boolean!
+}
+
+type TagUpdateReply {
+  success: Boolean!
+}
+
+# Tag URL contains brand and path used to construct a URL
+type TagURL {
+  # Brand is used to extract the environment specific brand host
+  brand: String!
+
+  # Path of the url
+  path: String!
+}
+
+# The urls of the tag
+#
+#     "urls": {
+#         "canonical": {
+#             "brand": "smh",
+#             "path": "/topic/<tag-slug>-<tag-id>"
+#         },
+#         "published": {
+#             "brisbanetimes": {
+#                 "path": "/topic/<tag-slug>-<tag-id>"
+#             },
+#             "smh": {
+#                 "path": "/topic/<tag-slug>-<tag-id>"
+#             },
+#             "theage": {
+#                 "path": "/topic/<tag-slug>-<tag-id>"
+#             },
+#             "watoday": {
+#                 "path": "/topic/<tag-slug>-<tag-id>"
+#             }
+#         }
+#     }
+#
+type TagURLs {
+  # Canonical URL
+  canonical: TagURL
+
+  # Published URL
+  published: TagPublishedURLs
+}
+
+type Team {
+  # The unique id from matchID and teamID appended
+  id: ID!
+
+  # The Team Name
+  name: String!
+
+  # The Team Name Abbreviation
+  displayName: String
+
+  # The team score
+  score: String!
+
+  # The team ID
+  teamID: Int!
+}
+
+# TodaysPaperResponse is the response for todays paper request
+type TodaysPaperResponse {
+  link: String
+}
+
+# Business Top Bottom Quote data
+type TopBottomQuote {
+  # Company security code
+  ASXCode: String!
+
+  # The quote issuer name
+  issuerName: IssuerName!
+
+  # Last trade price
+  lastTradePrice: Float!
+
+  # Price movement
+  priceMovement: Float!
+
+  # Price movement percentage
+  priceMovementPercentage: Float!
+
+  # Trade value
+  tradeValue: Float!
+
+  # Trade volume
+  tradeVolume: Int!
+
+  # Last update time
+  lastUpdated: String!
+}
+
+input UpdateAccountInput {
+  # DEPRECATED: Account ID is sourced from the logged in member
+  id: ID
+  autoplay: Boolean!
+  postCode: String
+  state: String
+  suburb: String
+}
+
+type UpdateAccountResult {
+  autoplay: Boolean!
+  error: AccountError
+  id: ID!
+  new: Boolean!
+  location: AccountLocation
+}
+
+# Variations contains fields which are used to overwrite asset list entry fields
+type Variations {
+  # Asset about
+  about: String
+
+  # Asset headline
+  headline: String
+
+  # Asset featured images
+  featuredImages: AssetImages
+}
+
+# WidgetConfiguration represents the configuration of any related widget to the content unit
+type WidgetConfiguration {
+  # Type of the related widget
+  type: String
+
+  # Configuration data for the specified type of widget
+  data: WidgetData
+}
+
+# Union object representing the type of widget data
+union WidgetData = ScoreboardData | CricketScorecardData
