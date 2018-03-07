@@ -1,5 +1,5 @@
 ## Get started
 
 * Run `yarn`
-* To run flow use `yarn run flow`
-* To generate flow types from graphql schema, run `relay:schema:types`
+* To run flow use `yarn run check`
+* To generate flow types from graphql schema, run `yarn run relay:schema`
