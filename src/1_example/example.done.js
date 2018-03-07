@@ -1,10 +1,13 @@
 // @flow
-const a: number = 5
 
-function squareToString(x: number): string {
+function squareIntToString(x: number): string {
+  if (!Number.isInteger(x)) {
+    throw new Error('Parameter must be integer')
+  }
+
   return `Square of ${x} is ${x * x}`
 }
 
-const b = squareToString(5)
+// const b = squareIntToString({})
 
-b
+// b
