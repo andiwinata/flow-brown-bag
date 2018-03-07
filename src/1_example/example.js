@@ -1,4 +1,4 @@
-const a: number = 5
+const a = 5
 
 function squareToString(x) {
   return `Square of ${x} is ${x * x}`
