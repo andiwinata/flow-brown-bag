@@ -1,8 +1,8 @@
 // @flow
 
 function squareIntToString(x: number): string {
-  if (!Number.isInteger(x)) {
-    throw new Error('Parameter must be integer')
+  if (!isNumeric(x)) {
+    throw new Error('Parameter must be number')
   }
 
   return `Square of ${x} is ${x * x}`
@@ -11,3 +11,21 @@ function squareIntToString(x: number): string {
 // const b = squareIntToString({})
 
 // b
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function isNumeric(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
